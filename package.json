@@ -1,0 +1,16 @@
+{
+  "name": "graph-react",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "3d-force-graph": "^1.73.3",
+    "http-server": "^14.1.1"
+  }
+}

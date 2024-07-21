@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Force Graph</title>
+  <style>
+    body { margin: 0; }
+    #3d-graph { width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="3d-graph"></div>
+  <script src="//unpkg.com/3d-force-graph"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const Graph = ForceGraph3D()(document.getElementById('3d-graph'));
+
+      const transactions = [
+        { id: '1', name: 'Transaction 1', txnId: 'TXN12345', amount: '100.00', currency: 'USD', date: '2024-07-22', status: 'Completed', description: 'Payment from A to B' },
+        { id: '2', name: 'Transaction 2', txnId: 'TXN12346', amount: '200.00', currency: 'EUR', date: '2024-07-21', status: 'Pending', description: 'Payment from B to C' },
+        { id: '3', name: 'Transaction 3', txnId: 'TXN12347', amount: '150.00', currency: 'USD', date: '2024-07-20', status: 'Completed', description: 'Payment from C to A' },
+        { id: '4', name: 'Transaction 4', txnId: 'TXN12348', amount: '250.00', currency: 'GBP', date: '2024-07-19', status: 'Failed', description: 'Payment from A to D' },
+        { id: '5', name: 'Transaction 5', txnId: 'TXN12349', amount: '300.00', currency: 'JPY', date: '2024-07-18', status: 'Completed', description: 'Payment from D to E', initiator: 'User X' },
+        { id: '6', name: 'Transaction 6', txnId: 'TXN12350', amount: '400.00', currency: 'AUD', date: '2024-07-17', status: 'Pending', description: 'Payment from E to F', approver: 'User Y' },
+        { id: '7', name: 'Transaction 7', txnId: 'TXN12351', amount: '500.00', currency: 'CAD', date: '2024-07-16', status: 'Completed', description: 'Payment from F to G', type: 'Credit' },
+        { id: '8', name: 'Transaction 8', txnId: 'TXN12352', amount: '600.00', currency: 'CHF', date: '2024-07-15', status: 'Failed', description: 'Payment from G to H', type: 'Debit' },
+        { id: '9', name: 'Transaction 9', txnId: 'TXN12353', amount: '700.00', currency: 'INR', date: '2024-07-14', status: 'Completed', description: 'Payment from H to I', notes: 'Special handling required' },
+        { id: '10', name: 'Transaction 10', txnId: 'TXN12354', amount: '800.00', currency: 'USD', date: '2024-07-13', status: 'Pending', description: 'Payment from I to J', priority: 'High' },
+        { id: '11', name: 'Transaction 11', txnId: 'TXN12355', amount: '900.00', currency: 'USD', date: '2024-07-12', status: 'Completed', description: 'Payment from J to K' },
+        { id: '12', name: 'Transaction 12', txnId: 'TXN12356', amount: '1000.00', currency: 'EUR', date: '2024-07-11', status: 'Failed', description: 'Payment from K to L', type: 'Credit' },
+        { id: '13', name: 'Transaction 13', txnId: 'TXN12357', amount: '1100.00', currency: 'GBP', date: '2024-07-10', status: 'Completed', description: 'Payment from L to M', type: 'Debit', initiator: 'User Z' },
+        { id: '14', name: 'Transaction 14', txnId: 'TXN12358', amount: '1200.00', currency: 'JPY', date: '2024-07-09', status: 'Pending', description: 'Payment from M to N', approver: 'User X' },
+        { id: '15', name: 'Transaction 15', txnId: 'TXN12359', amount: '1300.00', currency: 'AUD', date: '2024-07-08', status: 'Completed', description: 'Payment from N to O', priority: 'Medium' },
+        { id: '16', name: 'Transaction 16', txnId: 'TXN12360', amount: '1400.00', currency: 'CAD', date: '2024-07-07', status: 'Failed', description: 'Payment from O to P', notes: 'Requires verification' },
+        { id: '17', name: 'Transaction 17', txnId: 'TXN12361', amount: '1500.00', currency: 'CHF', date: '2024-07-06', status: 'Completed', description: 'Payment from P to Q', type: 'Credit' },
+        { id: '18', name: 'Transaction 18', txnId: 'TXN12362', amount: '1600.00', currency: 'INR', date: '2024-07-05', status: 'Pending', description: 'Payment from Q to R', priority: 'Low' },
+        { id: '19', name: 'Transaction 19', txnId: 'TXN12363', amount: '1700.00', currency: 'USD', date: '2024-07-04', status: 'Completed', description: 'Payment from R to S' },
+        { id: '20', name: 'Transaction 20', txnId: 'TXN12364', amount: '1800.00', currency: 'EUR', date: '2024-07-03', status: 'Failed', description: 'Payment from S to T', type: 'Debit' }
+      ];
+
+      const nodes = [];
+      const links = [];
+
+      transactions.forEach(txn => {
+        nodes.push({ id: txn.id, name: txn.name, group: 'transaction' });
+
+        // Add child nodes for each field
+        Object.keys(txn).forEach(field => {
+          if (field !== 'id' && field !== 'name') {
+            const childId = `${txn.id}-${field}`;
+            nodes.push({ id: childId, name: `${field}: ${txn[field]}`, group: 'field' });
+            links.push({ source: txn.id, target: childId, value: 1 });
+          }
+        });
+      });
+
+      // Add some relationship links between transactions
+      const relationshipLinks = [
+        { source: '1', target: '2', value: 1 },
+        { source: '2', target: '3', value: 1 },
+        { source: '3', target: '4', value: 1 },
+        { source: '4', target: '5', value: 1 },
+        { source: '5', target: '6', value: 1 },
+        { source: '6', target: '7', value: 1 },
+        { source: '7', target: '8', value: 1 },
+        { source: '8', target: '9', value: 1 },
+        { source: '9', target: '10', value: 1 },
+        { source: '10', target: '11', value: 1 },
+        { source: '11', target: '12', value: 1 },
+        { source: '12', target: '13', value: 1 },
+        { source: '13', target: '14', value: 1 },
+        { source: '14', target: '15', value: 1 },
+        { source: '15', target: '16', value: 1 },
+        { source: '16', target: '17', value: 1 },
+        { source: '17', target: '18', value: 1 },
+        { source: '18', target: '19', value: 1 },
+        { source: '19', target: '20', value: 1 }
+      ];
+
+      links.push(...relationshipLinks);
+
+      const data = { nodes, links };
+
+      Graph.nodeLabel('name')
+           .nodeAutoColorBy('group')
+           .graphData(data);
+    });
+  </script>
+</body>
+</html>
